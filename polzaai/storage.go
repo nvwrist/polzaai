@@ -3,8 +3,10 @@ package polzaai
 import (
 	"context"
 	"path/filepath"
-	"polzasdk/polzaai/models"
+
 	"strings"
+
+	"github.com/nvwrist/polzaai/polzaai/models"
 )
 
 type StorageService struct {

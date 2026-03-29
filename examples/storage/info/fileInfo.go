@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"polzasdk/polzaai"
 
 	"github.com/joho/godotenv"
+	"github.com/nvwrist/polzaai/polzaai"
 )
 
 func main() {

@@ -8,8 +8,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"polzasdk/polzaai/models"
+
 	"strings"
+
+	"github.com/nvwrist/polzaai/polzaai/models"
 )
 
 // Chat возвращает вспомогательный объект для работы с чатом.

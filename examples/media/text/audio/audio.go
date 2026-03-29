@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 	"os"
-	polzasdk2 "polzasdk/polzaai"
 
 	"github.com/joho/godotenv"
+	"github.com/nvwrist/polzaai/polzaai"
 )
 
 func main() {
@@ -14,11 +14,11 @@ func main() {
 		log.Fatal(err)
 	}
 	apiKey := os.Getenv("POLZA_API")
-	client := polzasdk2.NewClient(apiKey)
+	client := polzaai.NewClient(apiKey)
 	ctx := context.Background()
 
 	// Просто передаём значения
-	data, err := polzasdk2.GenerateAudio(
+	data, err := polzaai.GenerateAudio(
 		ctx,
 		client,
 		"elevenlabs/text-to-speech-turbo-2-5",

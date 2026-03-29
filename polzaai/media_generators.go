@@ -4,14 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	models2 "polzasdk/polzaai/models"
+
+	"github.com/nvwrist/polzaai/polzaai/models"
 )
 
 // GenerateImage создаёт изображение по тексту, сохраняет его и возвращает JSON с результатом.
 func GenerateImage(ctx context.Context, client *Client, model, prompt, aspectRatio, quality string) ([]byte, error) {
-	req := models2.MediaRequest{
+	req := models.MediaRequest{
 		Model: model,
-		Input: models2.MediaInput{
+		Input: models.MediaInput{
 			Prompt:      &prompt,
 			AspectRatio: &aspectRatio,
 			Quality:     &quality,
@@ -23,11 +24,11 @@ func GenerateImage(ctx context.Context, client *Client, model, prompt, aspectRat
 
 // EditImage редактирует изображение по тексту и исходному URL, возвращает JSON.
 func EditImage(ctx context.Context, client *Client, modelname, prompt, imageURL string) ([]byte, error) {
-	req := models2.MediaRequest{
+	req := models.MediaRequest{
 		Model: modelname,
-		Input: models2.MediaInput{
+		Input: models.MediaInput{
 			Prompt: &prompt,
-			Images: []models2.MediaFile{
+			Images: []models.MediaFile{
 				{Type: "url", Data: imageURL},
 			},
 		},
@@ -38,9 +39,9 @@ func EditImage(ctx context.Context, client *Client, modelname, prompt, imageURL 
 // GenerateVideo генерирует видео по тексту, возвращает JSON.
 func GenerateVideo(ctx context.Context, client *Client, modelname string, prompt string, durationSeconds string, resolution string, fps int) ([]byte, error) {
 	async := true
-	req := models2.MediaRequest{
+	req := models.MediaRequest{
 		Model: modelname,
-		Input: models2.MediaInput{
+		Input: models.MediaInput{
 			Prompt:          &prompt,
 			DurationSeconds: &durationSeconds,
 			Resolution:      &resolution,
@@ -54,11 +55,11 @@ func GenerateVideo(ctx context.Context, client *Client, modelname string, prompt
 // AnimateImage создаёт анимацию из изображения, возвращает JSON.
 func AnimateImage(ctx context.Context, client *Client, modelname string, prompt, imageURL string, durationSeconds string, fps int, resolution string) ([]byte, error) {
 	async := true
-	req := models2.MediaRequest{
+	req := models.MediaRequest{
 		Model: modelname,
-		Input: models2.MediaInput{
+		Input: models.MediaInput{
 			Prompt: &prompt,
-			Images: []models2.MediaFile{
+			Images: []models.MediaFile{
 				{Type: "url", Data: imageURL},
 			},
 			DurationSeconds: &durationSeconds,
@@ -73,11 +74,11 @@ func AnimateImage(ctx context.Context, client *Client, modelname string, prompt,
 // EditVideo редактирует видео по тексту, возвращает JSON.
 func EditVideo(ctx context.Context, client *Client, modelname string, prompt, videoURL string, strength float64, durationSeconds string) ([]byte, error) {
 	async := true
-	req := models2.MediaRequest{
+	req := models.MediaRequest{
 		Model: modelname,
-		Input: models2.MediaInput{
+		Input: models.MediaInput{
 			Prompt: &prompt,
-			Videos: []models2.MediaFile{
+			Videos: []models.MediaFile{
 				{Type: "url", Data: videoURL},
 			},
 			Strength:        &strength,
@@ -91,11 +92,11 @@ func EditVideo(ctx context.Context, client *Client, modelname string, prompt, vi
 // ExtendVideo продлевает видео, возвращает JSON.
 func ExtendVideo(ctx context.Context, client *Client, modelname string, prompt, videoURL string, durationSeconds string) ([]byte, error) {
 	async := true
-	req := models2.MediaRequest{
+	req := models.MediaRequest{
 		Model: modelname,
-		Input: models2.MediaInput{
+		Input: models.MediaInput{
 			Prompt: &prompt,
-			Videos: []models2.MediaFile{
+			Videos: []models.MediaFile{
 				{Type: "url", Data: videoURL},
 			},
 			DurationSeconds: &durationSeconds,
@@ -107,9 +108,9 @@ func ExtendVideo(ctx context.Context, client *Client, modelname string, prompt, 
 
 // GenerateAudio синтезирует речь (TTS), возвращает JSON.
 func GenerateAudio(ctx context.Context, client *Client, modelname, text, voice string, speed float64, format string) ([]byte, error) {
-	req := models2.MediaRequest{
+	req := models.MediaRequest{
 		Model: modelname,
-		Input: models2.MediaInput{
+		Input: models.MediaInput{
 			Prompt:       &text,
 			Voice:        &voice,
 			Speed:        &speed,
@@ -121,10 +122,10 @@ func GenerateAudio(ctx context.Context, client *Client, modelname, text, voice s
 
 // TranscribeAudio распознаёт речь (STT), возвращает JSON.
 func TranscribeAudio(ctx context.Context, client *Client, modelname string, audioURL, language string) ([]byte, error) {
-	req := models2.MediaRequest{
+	req := models.MediaRequest{
 		Model: modelname,
-		Input: models2.MediaInput{
-			Audio: &models2.MediaFile{
+		Input: models.MediaInput{
+			Audio: &models.MediaFile{
 				Type: "url",
 				Data: audioURL,
 			},
@@ -140,9 +141,9 @@ func TranscribeAudio(ctx context.Context, client *Client, modelname string, audi
 
 // GenerateMusic создаёт музыку через Suno, возвращает JSON.
 func GenerateMusic(ctx context.Context, client *Client, modelname string, prompt string, customMode, instrumental bool, version string) ([]byte, error) {
-	req := models2.MediaRequest{
+	req := models.MediaRequest{
 		Model: modelname,
-		Input: models2.MediaInput{
+		Input: models.MediaInput{
 			Prompt:       &prompt,
 			CustomMode:   &customMode,
 			Instrumental: &instrumental,
@@ -154,13 +155,13 @@ func GenerateMusic(ctx context.Context, client *Client, modelname string, prompt
 
 // ChatWithAudio отправляет запрос к gpt-audio-mini, возвращает JSON.
 func ChatWithAudio(ctx context.Context, client *Client, userMessage, voice, format string) ([]byte, error) {
-	req := models2.ChatCompletionRequest{
+	req := models.ChatCompletionRequest{
 		Model: "openai/gpt-audio-mini",
-		Messages: []models2.Message{
+		Messages: []models.Message{
 			{Role: "user", Content: userMessage},
 		},
 		Modalities: []string{"text", "audio"},
-		Audio: &models2.AudioOutputConfig{
+		Audio: &models.AudioOutputConfig{
 			Voice:  voice,
 			Format: format,
 		},
@@ -192,7 +193,7 @@ func ChatWithAudio(ctx context.Context, client *Client, userMessage, voice, form
 }
 
 // Внутренние вспомогательные функции
-func callMediaAndSave(ctx context.Context, client *Client, req models2.MediaRequest, filename string) ([]byte, error) {
+func callMediaAndSave(ctx context.Context, client *Client, req models.MediaRequest, filename string) ([]byte, error) {
 	resp, err := client.Media().CreateMedia(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("ошибка запроса: %w", err)
@@ -213,7 +214,7 @@ func callMediaAndSave(ctx context.Context, client *Client, req models2.MediaRequ
 	return json.MarshalIndent(resp, "", "  ")
 }
 
-func callMediaAsyncAndSave(ctx context.Context, client *Client, req models2.MediaRequest, filename string) ([]byte, error) {
+func callMediaAsyncAndSave(ctx context.Context, client *Client, req models.MediaRequest, filename string) ([]byte, error) {
 	if req.Async == nil {
 		asyncTrue := true
 		req.Async = &asyncTrue

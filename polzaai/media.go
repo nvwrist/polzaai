@@ -3,7 +3,8 @@ package polzaai
 
 import (
 	"context"
-	"polzasdk/polzaai/models"
+
+	"github.com/nvwrist/polzaai/polzaai/models"
 )
 
 // MediaService для работы с /v1/media.

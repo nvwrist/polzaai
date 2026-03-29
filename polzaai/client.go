@@ -6,9 +6,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/nvwrist/polzaai/polzaai/models"
+
 	"io"
 	"net/http"
-	models2 "polzasdk/polzaai/models"
 	"time"
 )
 
@@ -67,7 +68,7 @@ func (c *Client) doRequest(ctx context.Context, method, path string, body interf
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		var errResp models2.ErrorResponse
+		var errResp models.ErrorResponse
 		if err := json.Unmarshal(respBody, &errResp); err != nil {
 			return fmt.Errorf("API вернул статус %d, тело: %s", resp.StatusCode, string(respBody))
 		}
@@ -83,8 +84,8 @@ func (c *Client) doRequest(ctx context.Context, method, path string, body interf
 }
 
 // models.go – в client.go добавим
-func (c *Client) ListModels(ctx context.Context) (*models2.ModelsResponse, error) {
-	var result models2.ModelsResponse
+func (c *Client) ListModels(ctx context.Context) (*models.ModelsResponse, error) {
+	var result models.ModelsResponse
 	err := c.doRequest(ctx, "GET", "/models", nil, &result)
 	if err != nil {
 		return nil, err
@@ -92,7 +93,7 @@ func (c *Client) ListModels(ctx context.Context) (*models2.ModelsResponse, error
 	return &result, nil
 }
 
-func (c *Client) GetModelInfo(ctx context.Context, modelID string) (*models2.ModelInfo, error) {
+func (c *Client) GetModelInfo(ctx context.Context, modelID string) (*models.ModelInfo, error) {
 	resp, err := c.ListModels(ctx)
 	if err != nil {
 		return nil, err

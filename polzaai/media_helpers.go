@@ -7,9 +7,11 @@ import (
 	"io"
 	"net/http"
 	"path/filepath"
-	models2 "polzasdk/polzaai/models"
+
 	"strings"
 	"time"
+
+	"github.com/nvwrist/polzaai/polzaai/models"
 )
 
 // saveToStorage скачивает файл (если URL) или принимает base64, загружает в хранилище.
@@ -65,7 +67,7 @@ func saveToStorage(ctx context.Context, client *Client, urlOrBase64, filename st
 		}
 	}
 
-	uploadResp, err := client.Storage().UploadFile(ctx, models2.UploadFileRequest{
+	uploadResp, err := client.Storage().UploadFile(ctx, models.UploadFileRequest{
 		Filename: actualFilename,
 		Data:     fileData,
 		Policy:   "PERMANENT",
@@ -77,7 +79,7 @@ func saveToStorage(ctx context.Context, client *Client, urlOrBase64, filename st
 }
 
 // getMediaURL извлекает URL из поля Data ответа MediaResponse.
-func getMediaURL(resp *models2.MediaResponse) string {
+func getMediaURL(resp *models.MediaResponse) string {
 	if resp.Data == nil {
 		return ""
 	}
@@ -101,7 +103,7 @@ func getMediaURL(resp *models2.MediaResponse) string {
 }
 
 // waitForMediaCompletion ожидает завершения асинхронной задачи.
-func waitForMediaCompletion(ctx context.Context, client *Client, mediaID string) (*models2.MediaResponse, error) {
+func waitForMediaCompletion(ctx context.Context, client *Client, mediaID string) (*models.MediaResponse, error) {
 	ticker := time.NewTicker(2 * time.Second)
 	defer ticker.Stop()
 	maxAttempts := 60
