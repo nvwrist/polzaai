@@ -9,7 +9,7 @@ import (
 )
 
 // GenerateImage создаёт изображение по тексту, сохраняет его и возвращает JSON с результатом.
-func GenerateImage(ctx context.Context, client *Client, model, prompt, aspectRatio, quality string) ([]byte, error) {
+func GenerateImage(ctx context.Context, client *Client, model, prompt, aspectRatio, quality string, userid string) ([]byte, error) {
 	req := models.MediaRequest{
 		Model: model,
 		Input: models.MediaInput{
@@ -18,12 +18,13 @@ func GenerateImage(ctx context.Context, client *Client, model, prompt, aspectRat
 			Quality:     &quality,
 			MaxImages:   intPtr(1),
 		},
+		User: &userid,
 	}
 	return callMediaAndSave(ctx, client, req, "generated_image.png")
 }
 
 // EditImage редактирует изображение по тексту и исходному URL, возвращает JSON.
-func EditImage(ctx context.Context, client *Client, modelname, prompt, imageURL string) ([]byte, error) {
+func EditImage(ctx context.Context, client *Client, modelname, prompt, imageURL string, userid string) ([]byte, error) {
 	req := models.MediaRequest{
 		Model: modelname,
 		Input: models.MediaInput{
@@ -32,12 +33,13 @@ func EditImage(ctx context.Context, client *Client, modelname, prompt, imageURL 
 				{Type: "url", Data: imageURL},
 			},
 		},
+		User: &userid,
 	}
 	return callMediaAndSave(ctx, client, req, "edited_image.png")
 }
 
 // GenerateVideo генерирует видео по тексту, возвращает JSON.
-func GenerateVideo(ctx context.Context, client *Client, modelname string, prompt string, durationSeconds string, resolution string, fps int) ([]byte, error) {
+func GenerateVideo(ctx context.Context, client *Client, modelname string, prompt string, durationSeconds string, resolution string, fps int, userid string) ([]byte, error) {
 	async := true
 	req := models.MediaRequest{
 		Model: modelname,
@@ -47,13 +49,14 @@ func GenerateVideo(ctx context.Context, client *Client, modelname string, prompt
 			Resolution:      &resolution,
 			FPS:             &fps,
 		},
+		User:  &userid,
 		Async: &async,
 	}
 	return callMediaAsyncAndSave(ctx, client, req, "generated_video.mp4")
 }
 
 // AnimateImage создаёт анимацию из изображения, возвращает JSON.
-func AnimateImage(ctx context.Context, client *Client, modelname string, prompt, imageURL string, durationSeconds string, fps int, resolution string) ([]byte, error) {
+func AnimateImage(ctx context.Context, client *Client, modelname string, prompt, imageURL string, durationSeconds string, fps int, resolution string, userid string) ([]byte, error) {
 	async := true
 	req := models.MediaRequest{
 		Model: modelname,
@@ -66,13 +69,14 @@ func AnimateImage(ctx context.Context, client *Client, modelname string, prompt,
 			FPS:             &fps,
 			Resolution:      &resolution,
 		},
+		User:  &userid,
 		Async: &async,
 	}
 	return callMediaAsyncAndSave(ctx, client, req, "animated_video.mp4")
 }
 
 // EditVideo редактирует видео по тексту, возвращает JSON.
-func EditVideo(ctx context.Context, client *Client, modelname string, prompt, videoURL string, strength float64, durationSeconds string) ([]byte, error) {
+func EditVideo(ctx context.Context, client *Client, modelname string, prompt, videoURL string, strength float64, durationSeconds string, userid string) ([]byte, error) {
 	async := true
 	req := models.MediaRequest{
 		Model: modelname,
@@ -84,13 +88,14 @@ func EditVideo(ctx context.Context, client *Client, modelname string, prompt, vi
 			Strength:        &strength,
 			DurationSeconds: &durationSeconds,
 		},
+		User:  &userid,
 		Async: &async,
 	}
 	return callMediaAsyncAndSave(ctx, client, req, "edited_video.mp4")
 }
 
 // ExtendVideo продлевает видео, возвращает JSON.
-func ExtendVideo(ctx context.Context, client *Client, modelname string, prompt, videoURL string, durationSeconds string) ([]byte, error) {
+func ExtendVideo(ctx context.Context, client *Client, modelname string, prompt, videoURL string, durationSeconds string, userid string) ([]byte, error) {
 	async := true
 	req := models.MediaRequest{
 		Model: modelname,
@@ -101,13 +106,14 @@ func ExtendVideo(ctx context.Context, client *Client, modelname string, prompt, 
 			},
 			DurationSeconds: &durationSeconds,
 		},
+		User:  &userid,
 		Async: &async,
 	}
 	return callMediaAsyncAndSave(ctx, client, req, "extended_video.mp4")
 }
 
 // GenerateAudio синтезирует речь (TTS), возвращает JSON.
-func GenerateAudio(ctx context.Context, client *Client, modelname, text, voice string, speed float64, format string) ([]byte, error) {
+func GenerateAudio(ctx context.Context, client *Client, modelname, text, voice string, speed float64, format string, userid string) ([]byte, error) {
 	req := models.MediaRequest{
 		Model: modelname,
 		Input: models.MediaInput{
@@ -116,12 +122,13 @@ func GenerateAudio(ctx context.Context, client *Client, modelname, text, voice s
 			Speed:        &speed,
 			OutputFormat: &format,
 		},
+		User: &userid,
 	}
 	return callMediaAndSave(ctx, client, req, "generated_audio.mp3")
 }
 
 // TranscribeAudio распознаёт речь (STT), возвращает JSON.
-func TranscribeAudio(ctx context.Context, client *Client, modelname string, audioURL, language string) ([]byte, error) {
+func TranscribeAudio(ctx context.Context, client *Client, modelname string, audioURL, language string, userid string) ([]byte, error) {
 	req := models.MediaRequest{
 		Model: modelname,
 		Input: models.MediaInput{
@@ -131,6 +138,7 @@ func TranscribeAudio(ctx context.Context, client *Client, modelname string, audi
 			},
 			Language: &language,
 		},
+		User: &userid,
 	}
 	resp, err := client.Media().CreateMedia(ctx, req)
 	if err != nil {
@@ -140,7 +148,7 @@ func TranscribeAudio(ctx context.Context, client *Client, modelname string, audi
 }
 
 // GenerateMusic создаёт музыку через Suno, возвращает JSON.
-func GenerateMusic(ctx context.Context, client *Client, modelname string, prompt string, customMode, instrumental bool, version string) ([]byte, error) {
+func GenerateMusic(ctx context.Context, client *Client, modelname string, prompt string, customMode, instrumental bool, version string, userid string) ([]byte, error) {
 	req := models.MediaRequest{
 		Model: modelname,
 		Input: models.MediaInput{
@@ -149,12 +157,13 @@ func GenerateMusic(ctx context.Context, client *Client, modelname string, prompt
 			Instrumental: &instrumental,
 			Version:      &version,
 		},
+		User: &userid,
 	}
 	return callMediaAndSave(ctx, client, req, "generated_music.mp3")
 }
 
 // ChatWithAudio отправляет запрос к gpt-audio-mini, возвращает JSON.
-func ChatWithAudio(ctx context.Context, client *Client, userMessage, voice, format string) ([]byte, error) {
+func ChatWithAudio(ctx context.Context, client *Client, userMessage, voice, format string, userid string) ([]byte, error) {
 	req := models.ChatCompletionRequest{
 		Model: "openai/gpt-audio-mini",
 		Messages: []models.Message{
@@ -165,6 +174,7 @@ func ChatWithAudio(ctx context.Context, client *Client, userMessage, voice, form
 			Voice:  voice,
 			Format: format,
 		},
+		User: &userid,
 	}
 	resp, err := client.Chat().CreateCompletion(ctx, req)
 	if err != nil {
