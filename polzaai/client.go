@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"github.com/nvwrist/polzaai/polzaai/models"
 
 	"io"
@@ -27,7 +28,7 @@ func NewClient(apiKey string) *Client {
 		baseURL: "https://polza.ai/api/v1",
 		apiKey:  apiKey,
 		httpClient: &http.Client{
-			Timeout: 60 * time.Second, // можно переопределить через опции
+			Timeout: 10 * time.Minute, // можно переопределить через опции
 		},
 	}
 }
