@@ -74,18 +74,19 @@ func GenerateVideo(ctx context.Context, client *Client, modelname string, prompt
 }
 
 // AnimateImage создаёт анимацию из изображения, возвращает JSON.
-func AnimateImage(ctx context.Context, client *Client, modelname string, prompt, imageURL string, durationSeconds string, fps int, resolution string, userid string) ([]byte, error) {
+func AnimateImage(ctx context.Context, client *Client, modelname string, prompt, imageURL string, durationSeconds string, fps int, resolution string, userid string, aspectRatio string, strength float64, guidanceScale float64) ([]byte, error) {
 	async := true
 	req := models.MediaRequest{
 		Model: modelname,
 		Input: models.MediaInput{
-			Prompt: &prompt,
-			Images: []models.MediaFile{
-				{Type: "url", Data: imageURL},
-			},
+			Prompt:          &prompt,
+			Images:          []models.MediaFile{{Type: "url", Data: imageURL}},
 			DurationSeconds: &durationSeconds,
 			FPS:             &fps,
 			Resolution:      &resolution,
+			AspectRatio:     &aspectRatio,
+			Strength:        &strength,
+			GuidanceScale:   &guidanceScale,
 		},
 		User:  &userid,
 		Async: &async,
