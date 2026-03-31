@@ -10,38 +10,43 @@ import (
 
 // GenerateImage создаёт изображение по тексту, сохраняет его и возвращает JSON с результатом.
 func GenerateImage(ctx context.Context, client *Client, model, prompt, aspectRatio, quality string, userid string, imageResolution string) ([]byte, error) {
+	input := models.MediaInput{
+		Prompt:      &prompt,
+		AspectRatio: &aspectRatio,
+		Quality:     &quality,
+		MaxImages:   intPtr(1),
+	}
+
+	// Присваиваем только если не пусто, иначе оставляем nil
+	if imageResolution != "" {
+		input.ImageResolution = &imageResolution
+	}
+
 	req := models.MediaRequest{
 		Model: model,
-		Input: models.MediaInput{
-			Prompt:          &prompt,
-			AspectRatio:     &aspectRatio,
-			Quality:         &quality,
-			MaxImages:       intPtr(1),
-			ImageResolution: &imageResolution,
-		},
-		User: &userid,
-	}
-	if imageResolution != "" {
-		req.Input.ImageResolution = &imageResolution
+		Input: input,
+		User:  &userid,
 	}
 	return callMediaAndSave(ctx, client, req, "generated_image.png")
 }
 
 // EditImage редактирует изображение по тексту и исходному URL, возвращает JSON.
 func EditImage(ctx context.Context, client *Client, modelname, prompt, imageURL string, userid string, imageResolution string) ([]byte, error) {
+	input := models.MediaInput{
+		Prompt: &prompt,
+		Images: []models.MediaFile{
+			{Type: "url", Data: imageURL},
+		},
+	}
+
+	if imageResolution != "" {
+		input.ImageResolution = &imageResolution
+	}
+
 	req := models.MediaRequest{
 		Model: modelname,
-		Input: models.MediaInput{
-			Prompt: &prompt,
-			Images: []models.MediaFile{
-				{Type: "url", Data: imageURL},
-			},
-			ImageResolution: &imageResolution,
-		},
-		User: &userid,
-	}
-	if imageResolution != "" {
-		req.Input.ImageResolution = &imageResolution
+		Input: input,
+		User:  &userid,
 	}
 	return callMediaAndSave(ctx, client, req, "edited_image.png")
 }
