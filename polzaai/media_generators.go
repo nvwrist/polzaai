@@ -21,6 +21,9 @@ func GenerateImage(ctx context.Context, client *Client, model, prompt, aspectRat
 		},
 		User: &userid,
 	}
+	if imageResolution != "" {
+		req.Input.ImageResolution = &imageResolution
+	}
 	return callMediaAndSave(ctx, client, req, "generated_image.png")
 }
 
@@ -36,6 +39,9 @@ func EditImage(ctx context.Context, client *Client, modelname, prompt, imageURL 
 			ImageResolution: &imageResolution,
 		},
 		User: &userid,
+	}
+	if imageResolution != "" {
+		req.Input.ImageResolution = &imageResolution
 	}
 	return callMediaAndSave(ctx, client, req, "edited_image.png")
 }
