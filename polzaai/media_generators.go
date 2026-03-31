@@ -221,17 +221,25 @@ func callMediaAndSave(ctx context.Context, client *Client, req models.MediaReque
 	if err != nil {
 		return nil, fmt.Errorf("ошибка запроса: %w", err)
 	}
-	mediaURL := getMediaURL(resp)
-	if mediaURL != "" {
-		savedURL, id, err := saveToStorage(ctx, client, mediaURL, filename)
-		if err != nil {
-			fmt.Printf("Предупреждение: не удалось сохранить в хранилище: %v\n", err)
-		} else {
-			resp.Data = map[string]interface{}{
-				"original_url": mediaURL,
+
+	// Извлекаем все исходные URL из ответа
+	urls := extractAllMediaURLs(resp)
+	if len(urls) > 0 {
+		saved := make([]map[string]interface{}, 0, len(urls))
+		for i, url := range urls {
+			savedURL, id, err := saveToStorage(ctx, client, url, filename)
+			if err != nil {
+				fmt.Printf("Предупреждение: не удалось сохранить файл %d в хранилище: %v\n", i+1, err)
+				continue
+			}
+			saved = append(saved, map[string]interface{}{
+				"original_url": url,
 				"stored_url":   savedURL,
 				"stored_id":    id,
-			}
+			})
+		}
+		if len(saved) > 0 {
+			resp.Data = saved
 		}
 	}
 	return json.MarshalIndent(resp, "", "  ")
@@ -250,20 +258,62 @@ func callMediaAsyncAndSave(ctx context.Context, client *Client, req models.Media
 	if err != nil {
 		return nil, err
 	}
-	mediaURL := getMediaURL(finalResp)
-	if mediaURL != "" {
-		savedURL, id, err := saveToStorage(ctx, client, mediaURL, filename)
-		if err != nil {
-			fmt.Printf("Предупреждение: не удалось сохранить в хранилище: %v\n", err)
-		} else {
-			finalResp.Data = map[string]interface{}{
-				"original_url": mediaURL,
+	// Извлекаем все URL
+	urls := extractAllMediaURLs(finalResp)
+	if len(urls) > 0 {
+		saved := []map[string]interface{}{}
+		for i, url := range urls {
+			savedURL, id, err := saveToStorage(ctx, client, url, filename)
+			if err != nil {
+				fmt.Printf("Предупреждение: не удалось сохранить файл %d в хранилище: %v\n", i+1, err)
+				continue
+			}
+			saved = append(saved, map[string]interface{}{
+				"original_url": url,
 				"stored_url":   savedURL,
 				"stored_id":    id,
-			}
+			})
+		}
+		if len(saved) > 0 {
+			finalResp.Data = saved
 		}
 	}
 	return json.MarshalIndent(finalResp, "", "  ")
+}
+
+// extractAllMediaURLs извлекает все URL из ответа MediaResponse
+func extractAllMediaURLs(resp *models.MediaResponse) []string {
+	var urls []string
+	if resp.Data == nil {
+		return urls
+	}
+
+	// Если Data — массив
+	if dataSlice, ok := resp.Data.([]interface{}); ok {
+		for _, item := range dataSlice {
+			if m, ok := item.(map[string]interface{}); ok {
+				if u, ok := m["url"].(string); ok && u != "" {
+					urls = append(urls, u)
+				}
+			}
+		}
+		return urls
+	}
+
+	// Если Data — объект
+	if dataMap, ok := resp.Data.(map[string]interface{}); ok {
+		if u, ok := dataMap["url"].(string); ok && u != "" {
+			urls = append(urls, u)
+		}
+		return urls
+	}
+
+	// Если Data — строка (URL)
+	if urlStr, ok := resp.Data.(string); ok && urlStr != "" {
+		urls = append(urls, urlStr)
+	}
+
+	return urls
 }
 
 // Вспомогательные функции для создания указателей (скрыты внутри)
