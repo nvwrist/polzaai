@@ -62,10 +62,10 @@ func GenerateVideo(ctx context.Context, client *Client, modelname string, prompt
 	req := models.MediaRequest{
 		Model: modelname,
 		Input: models.MediaInput{
-			Prompt:          &prompt,
-			DurationSeconds: &durationSeconds,
-			Resolution:      &resolution,
-			FPS:             &fps,
+			Prompt:     &prompt,
+			Duration:   &durationSeconds,
+			Resolution: &resolution,
+			FPS:        &fps,
 		},
 		User:  &userid,
 		Async: &async,
@@ -74,22 +74,32 @@ func GenerateVideo(ctx context.Context, client *Client, modelname string, prompt
 }
 
 // AnimateImage создаёт анимацию из изображения, возвращает JSON.
-func AnimateImage(ctx context.Context, client *Client, modelname string, prompt, imageURL string, durationSeconds string, fps int, resolution string, userid string, aspectRatio string, strength float64, guidanceScale float64) ([]byte, error) {
-	async := true
+func AnimateImage(ctx context.Context, client *Client, modelname string, prompt, imageURL string, duration string, resolution string, userid string, aspectRatio string, strength float64, guidance float64) ([]byte, error) {
+	isAsync := true
+
+	// ОПРЕДЕЛЯЕМ MODE:
+	// Для Kling Motion Control это обычно разрешение обработки
+	mode := "720p"
+	if resolution == "1080p" {
+		mode = "1080p"
+	}
+
 	req := models.MediaRequest{
 		Model: modelname,
 		Input: models.MediaInput{
-			Prompt:          &prompt,
-			Images:          []models.MediaFile{{Type: "url", Data: imageURL}},
-			DurationSeconds: &durationSeconds,
-			FPS:             &fps,
-			Resolution:      &resolution,
-			AspectRatio:     &aspectRatio,
-			Strength:        &strength,
-			GuidanceScale:   &guidanceScale,
+			Prompt:      &prompt,
+			AspectRatio: &aspectRatio,
+			Images: []models.MediaFile{
+				{Type: "url", Data: imageURL},
+			},
+			Duration:      &duration,
+			Resolution:    &resolution,
+			Mode:          &mode, // ТЕПЕРЬ ПОЛЕ ЕСТЬ В СТРУКТУРЕ И ПЕРЕДАЕТСЯ
+			Strength:      &strength,
+			GuidanceScale: &guidance,
 		},
 		User:  &userid,
-		Async: &async,
+		Async: &isAsync,
 	}
 	return callMediaAsyncAndSave(ctx, client, req, "animated_video.mp4")
 }
@@ -104,8 +114,8 @@ func EditVideo(ctx context.Context, client *Client, modelname string, prompt, vi
 			Videos: []models.MediaFile{
 				{Type: "url", Data: videoURL},
 			},
-			Strength:        &strength,
-			DurationSeconds: &durationSeconds,
+			Strength: &strength,
+			Duration: &durationSeconds,
 		},
 		User:  &userid,
 		Async: &async,
@@ -123,7 +133,7 @@ func ExtendVideo(ctx context.Context, client *Client, modelname string, prompt, 
 			Videos: []models.MediaFile{
 				{Type: "url", Data: videoURL},
 			},
-			DurationSeconds: &durationSeconds,
+			Duration: &durationSeconds,
 		},
 		User:  &userid,
 		Async: &async,

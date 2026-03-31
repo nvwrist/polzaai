@@ -13,23 +13,30 @@ type MediaRequest struct {
 // MediaInput содержит все возможные поля для генерации изображений, видео, аудио.
 // Поля, не поддерживаемые конкретной моделью, будут проигнорированы с предупреждением.
 type MediaInput struct {
-	Prompt                    *string     `json:"prompt,omitempty"`
-	AspectRatio               *string     `json:"aspect_ratio,omitempty"` // "16:9", "1:1", "9:16"
-	Images                    []MediaFile `json:"images,omitempty"`       // для img2img, edit
-	Videos                    []MediaFile `json:"videos,omitempty"`       // для vid2vid
-	Audio                     *MediaFile  `json:"audio,omitempty"`        // для TTS или STT
-	CallBackUrl               *string     `json:"callBackUrl,omitempty"`  // webhook после завершения
-	Seed                      *int64      `json:"seed,omitempty"`
-	Watermark                 *string     `json:"watermark,omitempty"`
-	ImageResolution           *string     `json:"image_resolution,omitempty"` // "1K", "2K", "4K"
-	Quality                   *string     `json:"quality,omitempty"`          // "standard", "high"
-	OutputFormat              *string     `json:"output_format,omitempty"`    // "png", "jpg", "mp4", "mp3"
-	MaxImages                 *int        `json:"max_images,omitempty"`       // до 10
-	IsEnhance                 *bool       `json:"isEnhance,omitempty"`
-	GuidanceScale             *float64    `json:"guidance_scale,omitempty"` // 1-20
-	Strength                  *float64    `json:"strength,omitempty"`       // 0-1
+	Prompt          *string     `json:"prompt,omitempty"`
+	AspectRatio     *string     `json:"aspect_ratio,omitempty"` // "16:9", "1:1", "9:16"
+	Images          []MediaFile `json:"images,omitempty"`       // для img2img, edit
+	Videos          []MediaFile `json:"videos,omitempty"`       // для vid2vid
+	Audio           *MediaFile  `json:"audio,omitempty"`        // для TTS или STT
+	CallBackUrl     *string     `json:"callBackUrl,omitempty"`  // webhook после завершения
+	Seed            *int64      `json:"seed,omitempty"`
+	Watermark       *string     `json:"watermark,omitempty"`
+	ImageResolution *string     `json:"image_resolution,omitempty"` // "1K", "2K", "4K"
+	Quality         *string     `json:"quality,omitempty"`          // "standard", "high"
+	OutputFormat    *string     `json:"output_format,omitempty"`    // "png", "jpg", "mp4", "mp3"
+	MaxImages       *int        `json:"max_images,omitempty"`       // до 10
+	IsEnhance       *bool       `json:"isEnhance,omitempty"`
+	GuidanceScale   *float64    `json:"guidance_scale,omitempty"` // 1-20
+	Strength        *float64    `json:"strength,omitempty"`       // 0-1
+
+	// НОВЫЕ ПОЛЯ ИЗ ДОКУМЕНТАЦИИ
+	Mode                 *string `json:"mode,omitempty"`                  // "std"/"pro" (Kling 3.0), "720p"/"1080p" (Motion Control)
+	MultiShots           *bool   `json:"multi_shots,omitempty"`           // true/false (Wan 2.1, Kling 3.0)
+	Sound                *bool   `json:"sound,omitempty"`                 // true/false (Kling 2.6/3.0)
+	CharacterOrientation *string `json:"character_orientation,omitempty"` // "image" или "video"
+	UpscaleFactor        *string `json:"upscale_factor,omitempty"`        // "1", "2", "4"
+
 	EnableSafetyChecker       *bool       `json:"enable_safety_checker,omitempty"`
-	UpscaleFactor             *string     `json:"upscale_factor,omitempty"` // "2", "4"
 	FontInputs                []FontInput `json:"font_inputs,omitempty"`
 	SuperResolutionReferences []string    `json:"super_resolution_references,omitempty"`
 	// Поля для аудио TTS
@@ -37,9 +44,9 @@ type MediaInput struct {
 	Speed    *float64 `json:"speed,omitempty"`    // 0.25-4.0
 	Language *string  `json:"language,omitempty"` // код языка
 	// Поля для видео
-	DurationSeconds *string `json:"duration,omitempty"`
-	FPS             *int    `json:"fps,omitempty"`
-	Resolution      *string `json:"resolution,omitempty"` // "480" "720p", "1080p"
+	Duration   *string `json:"duration,omitempty"` // "10s", "15s"
+	FPS        *int    `json:"fps,omitempty"`
+	Resolution *string `json:"resolution,omitempty"` // "480p", "720p", "1080p"
 	//для SUNO
 	CustomMode   *bool   `json:"customMode,omitempty"`
 	Instrumental *bool   `json:"instrumental,omitempty"`
