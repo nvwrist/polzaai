@@ -104,29 +104,43 @@ func getMediaURL(resp *models.MediaResponse) string {
 
 // waitForMediaCompletion ожидает завершения асинхронной задачи.
 func waitForMediaCompletion(ctx context.Context, client *Client, mediaID string) (*models.MediaResponse, error) {
-	ticker := time.NewTicker(2 * time.Second)
+	// Увеличиваем интервал до 10 секунд. Для видео это оптимально.
+	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
-	maxAttempts := 60
+
+	// 90 попыток по 10 секунд = 900 секунд (15 минут).
+	// Это как раз совпадает с таймаутом в твоем UniversalHandler.
+	maxAttempts := 90
+
 	for attempt := 1; attempt <= maxAttempts; attempt++ {
 		select {
 		case <-ctx.Done():
+			// Если время в context (15 мин) выйдет раньше, Go сам прервет цикл здесь
 			return nil, ctx.Err()
 		case <-ticker.C:
 			statusResp, err := client.Media().GetMediaStatus(ctx, mediaID)
 			if err != nil {
-				return nil, fmt.Errorf("ошибка получения статуса: %w", err)
+				// Можно добавить лог, чтобы видеть ошибки сети во время ожидания
+				fmt.Printf("[SDK DEBUG] Ошибка опроса статуса (попытка %d): %v\n", attempt, err)
+				continue // Пропускаем ошибку и пробуем в следующий раз
 			}
+
+			fmt.Printf("[SDK DEBUG] Статус задачи %s: %s (попытка %d/%d)\n",
+				mediaID, statusResp.Status, attempt, maxAttempts)
+
 			switch statusResp.Status {
 			case "completed":
 				return statusResp, nil
-			case "failed":
+			case "failed", "error": // Добавляем обработку обоих вариантов ошибок
 				errMsg := "неизвестная ошибка"
 				if statusResp.Error != nil {
 					errMsg = statusResp.Error.Message
 				}
 				return nil, fmt.Errorf("задача завершилась с ошибкой: %s", errMsg)
+			case "cancelled":
+				return nil, fmt.Errorf("задача была отменена")
 			}
 		}
 	}
-	return nil, fmt.Errorf("превышено время ожидания завершения")
+	return nil, fmt.Errorf("превышено время ожидания завершения (ждали 15 минут)")
 }
