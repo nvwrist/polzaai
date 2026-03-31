@@ -94,7 +94,7 @@ func AnimateImage(ctx context.Context, client *Client, modelname string, prompt,
 			},
 			Duration:      &duration,
 			Resolution:    &resolution,
-			Mode:          &mode, // ТЕПЕРЬ ПОЛЕ ЕСТЬ В СТРУКТУРЕ И ПЕРЕДАЕТСЯ
+			Mode:          &mode, // ТЕПЕРЬ ПОЛЕ ЕСТЬ В СТРУКТУРЕ И ПЕРЕДАЕТСЯ.
 			Strength:      &strength,
 			GuidanceScale: &guidance,
 		},
