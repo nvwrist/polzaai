@@ -39,7 +39,7 @@ type MediaInput struct {
 	// Поля для видео
 	DurationSeconds *string `json:"duration,omitempty"`
 	FPS             *int    `json:"fps,omitempty"`
-	Resolution      *string `json:"resolution,omitempty"` // "720p", "1080p"
+	Resolution      *string `json:"resolution,omitempty"` // "480" "720p", "1080p"
 	//для SUNO
 	CustomMode   *bool   `json:"customMode,omitempty"`
 	Instrumental *bool   `json:"instrumental,omitempty"`

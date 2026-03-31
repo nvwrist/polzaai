@@ -9,14 +9,15 @@ import (
 )
 
 // GenerateImage создаёт изображение по тексту, сохраняет его и возвращает JSON с результатом.
-func GenerateImage(ctx context.Context, client *Client, model, prompt, aspectRatio, quality string, userid string) ([]byte, error) {
+func GenerateImage(ctx context.Context, client *Client, model, prompt, aspectRatio, quality string, userid string, imageResolution string) ([]byte, error) {
 	req := models.MediaRequest{
 		Model: model,
 		Input: models.MediaInput{
-			Prompt:      &prompt,
-			AspectRatio: &aspectRatio,
-			Quality:     &quality,
-			MaxImages:   intPtr(1),
+			Prompt:          &prompt,
+			AspectRatio:     &aspectRatio,
+			Quality:         &quality,
+			MaxImages:       intPtr(1),
+			ImageResolution: &imageResolution,
 		},
 		User: &userid,
 	}
@@ -24,7 +25,7 @@ func GenerateImage(ctx context.Context, client *Client, model, prompt, aspectRat
 }
 
 // EditImage редактирует изображение по тексту и исходному URL, возвращает JSON.
-func EditImage(ctx context.Context, client *Client, modelname, prompt, imageURL string, userid string) ([]byte, error) {
+func EditImage(ctx context.Context, client *Client, modelname, prompt, imageURL string, userid string, imageResolution string) ([]byte, error) {
 	req := models.MediaRequest{
 		Model: modelname,
 		Input: models.MediaInput{
@@ -32,6 +33,7 @@ func EditImage(ctx context.Context, client *Client, modelname, prompt, imageURL 
 			Images: []models.MediaFile{
 				{Type: "url", Data: imageURL},
 			},
+			ImageResolution: &imageResolution,
 		},
 		User: &userid,
 	}
