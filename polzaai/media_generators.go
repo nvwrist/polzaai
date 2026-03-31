@@ -31,18 +31,23 @@ func GenerateImage(ctx context.Context, client *Client, model, prompt, aspectRat
 }
 
 // EditImage редактирует изображение по тексту и исходному URL, возвращает JSON.
-func EditImage(ctx context.Context, client *Client, modelname, prompt, imageURL string, userid string, imageResolution string) ([]byte, error) {
+// EditImage редактирует изображение по тексту и исходному URL, возвращает JSON.
+func EditImage(ctx context.Context, client *Client, modelname, prompt, imageURL string, userid string, imageResolution string, aspectRatio string, quality string) ([]byte, error) {
 	input := models.MediaInput{
 		Prompt: &prompt,
 		Images: []models.MediaFile{
 			{Type: "url", Data: imageURL},
 		},
 	}
-
 	if imageResolution != "" {
 		input.ImageResolution = &imageResolution
 	}
-
+	if aspectRatio != "" {
+		input.AspectRatio = &aspectRatio
+	}
+	if quality != "" {
+		input.Quality = &quality
+	}
 	req := models.MediaRequest{
 		Model: modelname,
 		Input: input,
