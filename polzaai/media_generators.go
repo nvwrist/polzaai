@@ -57,13 +57,13 @@ func EditImage(ctx context.Context, client *Client, modelname, prompt, imageURL 
 }
 
 // GenerateVideo генерирует видео по тексту, возвращает JSON.
-func GenerateVideo(ctx context.Context, client *Client, modelname string, prompt string, durationSeconds string, resolution string, fps int, userid string) ([]byte, error) {
+func GenerateVideo(ctx context.Context, client *Client, modelname string, prompt string, duration string, resolution string, fps int, userid string) ([]byte, error) {
 	async := true
 	req := models.MediaRequest{
 		Model: modelname,
 		Input: models.MediaInput{
 			Prompt:     &prompt,
-			Duration:   &durationSeconds,
+			Duration:   &duration, // Изменено с DurationSeconds на Duration
 			Resolution: &resolution,
 			FPS:        &fps,
 		},
@@ -77,8 +77,7 @@ func GenerateVideo(ctx context.Context, client *Client, modelname string, prompt
 func AnimateImage(ctx context.Context, client *Client, modelname string, prompt, imageURL string, duration string, resolution string, userid string, aspectRatio string, strength float64, guidance float64) ([]byte, error) {
 	isAsync := true
 
-	// ОПРЕДЕЛЯЕМ MODE:
-	// Для Kling Motion Control это обычно разрешение обработки
+	// Для Kling Motion Control поле mode — это "720p" или "1080p"
 	mode := "720p"
 	if resolution == "1080p" {
 		mode = "1080p"
@@ -92,9 +91,9 @@ func AnimateImage(ctx context.Context, client *Client, modelname string, prompt,
 			Images: []models.MediaFile{
 				{Type: "url", Data: imageURL},
 			},
-			Duration:      &duration,
+			Duration:      &duration, // Используем новое имя поля из твоей структуры
 			Resolution:    &resolution,
-			Mode:          &mode, // ТЕПЕРЬ ПОЛЕ ЕСТЬ В СТРУКТУРЕ И ПЕРЕДАЕТСЯ.
+			Mode:          &mode, // Теперь это поле есть в твоей структуре
 			Strength:      &strength,
 			GuidanceScale: &guidance,
 		},
